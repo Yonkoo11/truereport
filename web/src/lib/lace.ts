@@ -12,7 +12,7 @@ import { Transaction, type Binding, type FinalizedTransaction, type Proof, type 
 import type { UnboundTransaction } from '@midnight-ntwrk/midnight-js-types';
 import { CompiledTrueReportContract } from '../../../contract/src/index';
 import { CONTRACT_ADDRESS, NETWORK } from './config';
-import { inMemoryPrivateStateProvider } from './in-memory-private-state-provider';
+import { inMemoryPrivateStateProvider } from './session-state-provider';
 
 export const NO_LACE = 'Midnight Lace wallet not found. Install Lace and switch it to Preview, then reload.';
 
