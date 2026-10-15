@@ -100,3 +100,7 @@ ai/
 .midnight-wallet-state/
 .operator/
 midnight-level-db/
+.env.*
+CLAUDE.md
+.claudeignore
+.ralph/
