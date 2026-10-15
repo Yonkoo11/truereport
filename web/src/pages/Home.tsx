@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Stamp from '../components/Stamp';
-import { CONTRACT_ADDRESS, NETWORK } from '../lib/config';
+import { decodeQr, encodeQr } from '../../../contract/src/report';
+import { CONTRACT_ADDRESS, EXAMPLE_GENUINE, EXAMPLE_REVOKED, NETWORK } from '../lib/config';
 import { shortAddr } from '../lib/format';
 import { registryStats } from '../lib/verify';
 
@@ -19,13 +20,14 @@ export default function Home() {
         <div>
           <h1 className="h1 h1--big">Check a Nigerian medical report in ten seconds.</h1>
           <p className="hero__body">
-            Doctors issue sick notes, fitness certificates and medical reports with a QR code. Anyone can scan it to see if the paper is genuine and
+            Doctors can issue sick notes, fitness certificates and medical reports with a QR code. Anyone can scan it to see if the paper is genuine and
             still valid. Nobody sees the diagnosis.
           </p>
           <div className="btn-row">
             <a className="btn btn--primary" href="/verify">Check a report</a>
             <a className="btn btn--secondary" href="/doctor">I'm a doctor</a>
           </div>
+          <Examples />
         </div>
         <figure className="paper" style={{ margin: 0 }}>
           <span className="paper__stamp"><Stamp word="Registered" tone="ok" size="sm" /></span>
@@ -39,14 +41,36 @@ export default function Home() {
       <ol className="how">
         {STEPS.map(([head, body], i) => (
           <li key={head}>
-            <span className="small">{i + 1}</span>
-            <h2 className="h2">{head}</h2>
+            <h2 className="h2"><span className="how__n">{i + 1}</span>{head}</h2>
             <p>{body}</p>
           </li>
         ))}
       </ol>
       <p className="small live num"><LiveLine /></p>
     </main>
+  );
+}
+
+/** The genuine example with its conclusion changed, so the registry has no match. */
+const altered = (fragment: string): string => encodeQr({ ...decodeQr(fragment), conclusion: 'Unfit for work for 14 days' });
+
+function Examples() {
+  if (!CONTRACT_ADDRESS || !EXAMPLE_GENUINE || !EXAMPLE_REVOKED) return null;
+  const links: [string, string][] = [
+    ['Genuine', EXAMPLE_GENUINE],
+    ['Revoked', EXAMPLE_REVOKED],
+    ['Altered', altered(EXAMPLE_GENUINE)],
+  ];
+  return (
+    <p className="small examples">
+      No paper to hand? Try an example:{' '}
+      {links.map(([label, f], i) => (
+        <span key={label}>
+          {i > 0 && ' · '}
+          <a href={`/verify#${f}`}>{label}</a>
+        </span>
+      ))}
+    </p>
   );
 }
 

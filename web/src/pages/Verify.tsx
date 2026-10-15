@@ -11,17 +11,30 @@ const STEP_LABELS = ["Reading the paper's code", 'Computing its fingerprint', 'A
 const STEP_INDEX: Record<Step, number> = { read: 1, hash: 2, ask: 3 };
 
 const VERDICT = {
-  genuine: { word: 'Genuine', tone: 'ok', sub: 'Issued by a doctor on the TrueReport registry and not revoked.' },
-  revoked: { word: 'Revoked', tone: 'danger', sub: 'The issuing doctor withdrew this report. Do not accept it.' },
+  genuine: {
+    word: 'Genuine',
+    tone: 'ok',
+    sub: 'Issued by a doctor on the TrueReport registry and not revoked.',
+    proves:
+      'The printed lines below came, unaltered, from a doctor key on the registry for that name and folio, and the doctor has not withdrawn the report. It does not prove the medical opinion is correct.',
+  },
+  revoked: {
+    word: 'Revoked',
+    tone: 'danger',
+    sub: 'The issuing doctor withdrew this report. Do not accept it.',
+    proves: 'A registered doctor issued these lines, then withdrew them. The paper no longer counts as valid.',
+  },
   notfound: {
     word: 'Not on the registry',
     tone: 'danger',
     sub: 'No registered doctor issued a report matching this paper. It may have been altered, or the code was copied from a different paper.',
+    proves: 'No doctor on the registry issued a report with these lines. The name and folio in the code are not confirmed.',
   },
   invalid: {
     word: 'Not valid',
     tone: 'unknown',
     sub: 'This code is not a TrueReport code, or it was damaged. Do not accept this paper on the strength of this code.',
+    proves: 'Nothing. The code could not be read, so the registry was not asked.',
   },
 } as const;
 
@@ -99,34 +112,44 @@ function Result({ r }: { r: CheckResult }) {
       <Stamp word={v.word} tone={v.tone} size="lg" />
       <p className="lead">{v.sub}</p>
       {r.verdict !== 'invalid' && (
-        <>
-          <p className="small num" style={{ marginTop: 'var(--space-2)' }}>
-            Read from registry contract {shortAddr(CONTRACT_ADDRESS)} on {NETWORK.label}
-            {r.block !== null && <> at block {r.block}</>}.
-          </p>
-          <div className="section">
-            <p className="h2">{r.payload.doctorName}</p>
-            <p className="small">MDCN folio {r.payload.doctorFolio}</p>
-          </div>
-          <section className="section stack">
-            <h2 className="h2">Compare each line with the paper in your hand</h2>
-            <Fields r={r.payload} />
-          </section>
-          <BodyCheck p={r.payload} />
-        </>
+        <p className="small num" style={{ marginTop: 'var(--space-2)' }}>
+          Read from registry contract {shortAddr(CONTRACT_ADDRESS)} on {NETWORK.label}
+          {r.block !== null && <> at block {r.block}</>}.
+        </p>
       )}
+      {r.verdict === 'genuine' && <Issued p={r.payload} />}
       <section className="section proves">
         <h2 className="h2">What this proves</h2>
-        <p>
-          The printed lines above came, unaltered, from a doctor key on the registry for that name and folio, and the doctor has not withdrawn the
-          report. It does not prove the medical opinion is correct.
-        </p>
+        <p>{v.proves}</p>
       </section>
+      {r.verdict === 'genuine' && <BodyCheck p={r.payload} />}
+      {(r.verdict === 'revoked' || r.verdict === 'notfound') && (
+        <details className="section">
+          <summary className="h2">{r.verdict === 'revoked' ? 'What was issued, then withdrawn' : 'What the code claims (not confirmed)'}</summary>
+          <p className="small" style={{ marginTop: 'var(--space-4)' }}>{r.payload.doctorName}, MDCN folio {r.payload.doctorFolio}</p>
+          <Fields r={r.payload} />
+        </details>
+      )}
       <div className="section">
         <a className="btn btn--secondary" href="/verify">Check another report</a>
       </div>
       <Privacy />
     </main>
+  );
+}
+
+function Issued({ p }: { p: QrPayload }) {
+  return (
+    <>
+      <div className="section">
+        <p className="h2">{p.doctorName}</p>
+        <p className="small">MDCN folio {p.doctorFolio}</p>
+      </div>
+      <section className="section stack">
+        <h2 className="h2">Compare each line with the paper in your hand</h2>
+        <Fields r={p} />
+      </section>
+    </>
   );
 }
 
@@ -136,11 +159,9 @@ function BodyCheck({ p }: { p: QrPayload }) {
   const area = useRef<HTMLTextAreaElement>(null);
   const run = async () => setResult(await bodyMatches(text, p));
   return (
-    <section className="section stack">
-      <div>
-        <h2 className="h2">Check the body text (optional)</h2>
-        <p className="small" style={{ marginTop: 'var(--space-2)' }}>Type the report text exactly as printed. It stays on this phone.</p>
-      </div>
+    <details className="section stack">
+      <summary className="h2">Check the body text too</summary>
+      <p className="small">Type the report text exactly as printed. It stays on this phone.</p>
       <textarea
         ref={area}
         className="textarea"
@@ -152,9 +173,8 @@ function BodyCheck({ p }: { p: QrPayload }) {
         }}
       />
       <button className="btn btn--secondary" onClick={run} disabled={!text.trim()}>Check body text</button>
-      {result === null && <p className="small">Body text not checked.</p>}
       {result === true && <p className="ok-text">Body text matches.</p>}
       {result === false && <p className="danger-text">Body text does not match what the doctor issued.</p>}
-    </section>
+    </details>
   );
 }

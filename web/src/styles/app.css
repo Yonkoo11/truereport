@@ -148,6 +148,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
 .how { display: grid; gap: var(--space-6); margin-top: var(--space-16); }
 @media (min-width: 960px) { .how { grid-template-columns: repeat(3, 1fr); gap: var(--space-8); } }
 .how p { margin-top: var(--space-2); }
+.how__n { color: var(--ink-2); margin-right: var(--space-2); font-variant-numeric: tabular-nums; }
+.examples { margin-top: var(--space-4); }
+summary { cursor: pointer; }
 .live { margin-top: var(--space-12); padding-bottom: var(--space-16); }
 
 /* print sheet */

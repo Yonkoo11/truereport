@@ -28,3 +28,7 @@ export const CONTRACT_ADDRESS: string = (import.meta.env.VITE_CONTRACT_ADDRESS ?
 
 export const SITE_DOMAIN = 'truereport.vercel.app';
 export const VERIFY_BASE = `${import.meta.env.VITE_VERIFY_BASE ?? `https://${SITE_DOMAIN}`}/verify`;
+
+/** Fragments of real reports issued on this network, for the home page examples. Empty hides them. */
+export const EXAMPLE_GENUINE: string = (import.meta.env.VITE_EXAMPLE_GENUINE ?? '').trim();
+export const EXAMPLE_REVOKED: string = (import.meta.env.VITE_EXAMPLE_REVOKED ?? '').trim();
