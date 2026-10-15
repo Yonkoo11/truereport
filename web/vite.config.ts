@@ -1,7 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import wasm from 'vite-plugin-wasm';
-import topLevelAwait from 'vite-plugin-top-level-await';
 
 export default defineConfig({
   cacheDir: './.vite',
@@ -24,10 +23,6 @@ export default defineConfig({
   plugins: [
     react(),
     wasm(),
-    topLevelAwait({
-      promiseExportName: '__tla',
-      promiseImportName: (i) => `__tla_${i}`,
-    }),
     {
       name: 'wasm-module-resolver',
       resolveId(source, importer) {

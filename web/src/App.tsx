@@ -1,11 +1,17 @@
-import { useEffect, useState } from 'react';
-import { check } from './lib/verify';
-import { CONTRACT_ADDRESS } from './lib/config';
+import Header from './components/Header';
+import Doctor from './pages/Doctor';
+import Home from './pages/Home';
+import Registrar from './pages/Registrar';
+import Verify from './pages/Verify';
+
+const PAGES: Record<string, () => React.JSX.Element> = { '/': Home, '/verify': Verify, '/doctor': Doctor, '/registrar': Registrar };
 
 export default function App() {
-  const [out, setOut] = useState('checking');
-  useEffect(() => {
-    check(location.hash.slice(1), CONTRACT_ADDRESS).then((r) => setOut(r.verdict), (e) => setOut('error: ' + String(e?.message ?? e)));
-  }, []);
-  return <p id="verdict">{out}</p>;
+  const Page = PAGES[location.pathname.replace(/\/+$/, '') || '/'] ?? Home;
+  return (
+    <>
+      <Header />
+      <Page />
+    </>
+  );
 }

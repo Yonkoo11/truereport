@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "mkdir -p ./public/keys ./public/zkir && cp -r ../contract/managed/truereport/keys/* ./public/keys/ && cp -r ../contract/managed/truereport/zkir/* ./public/zkir/ && vite",
-    "build": "tsc && vite build --mode preprod && cp -r ../contract/managed/truereport/keys ./dist/keys && cp -r ../contract/managed/truereport/zkir ./dist/zkir",
+    "build": "tsc && vite build && cp -r ../contract/managed/truereport/keys ./dist/keys && cp -r ../contract/managed/truereport/zkir ./dist/zkir",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -20,23 +20,17 @@
     "@midnight-ntwrk/midnight-js-utils": "4.1.1",
     "@types/qrcode": "^1.5.5",
     "buffer": "^6.0.3",
-    "fp-ts": "^2.16.11",
-    "pino": "^10.3.1",
     "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "rxjs": "^7.8.2",
-    "semver": "^7.7.4",
     "truereport-contract": "*"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "@types/semver": "^7.7.1",
     "@vitejs/plugin-react": "^5.1.4",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
-    "vite-plugin-top-level-await": "^1.6.0",
     "vite-plugin-wasm": "^3.5.0"
   }
 }

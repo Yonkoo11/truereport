@@ -5,7 +5,7 @@ import { NETWORK } from './config';
 
 export type Verdict = 'genuine' | 'revoked' | 'notfound' | 'invalid';
 export type Step = 'read' | 'hash' | 'ask';
-export type CheckResult = { verdict: 'invalid' } | { verdict: Exclude<Verdict, 'invalid'>; payload: QrPayload };
+export type CheckResult = { verdict: 'invalid' } | { verdict: Exclude<Verdict, 'invalid'>; payload: QrPayload; block: number | null };
 
 const TRIES = 3;
 const GAP_MS = 2000;
@@ -14,8 +14,8 @@ export const SLOW_MS = 8000;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /**
- * The whole check runs in this browser. The only request is one indexer query
- * carrying the contract address; the fragment and its fields never leave the page.
+ * The whole check runs in this browser. The only requests are indexer queries
+ * carrying the contract address or nothing at all; the fragment and its fields never leave the page.
  */
 export async function check(fragment: string, address: string, onStep: (s: Step) => void = () => {}): Promise<CheckResult> {
   let p: QrPayload;
@@ -30,16 +30,31 @@ export async function check(fragment: string, address: string, onStep: (s: Step)
   const provider = indexerPublicDataProvider(NETWORK.indexer, NETWORK.indexerWS);
   for (let i = 1; ; i++) {
     try {
-      const state = await provider.queryContractState(address);
+      const [state, block] = await Promise.all([provider.queryContractState(address), blockHeight()]);
       if (!state) throw new Error('registry contract not found on this network');
       const l = ledger(state.data);
       onStep('ask');
       const verdict = !l.issued.member(c) ? 'notfound' : l.revoked.member(c) ? 'revoked' : 'genuine';
-      return { verdict, payload: p };
+      return { verdict, payload: p, block };
     } catch (e) {
       if (i >= TRIES) throw e;
       await sleep(GAP_MS);
     }
+  }
+}
+
+/** Latest block height the indexer has seen; null if it does not answer. */
+export async function blockHeight(): Promise<number | null> {
+  try {
+    const r = await fetch(NETWORK.indexer, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ query: 'query { block { height } }' }),
+    });
+    const j: { data?: { block?: { height?: number } } } = await r.json();
+    return typeof j.data?.block?.height === 'number' ? j.data.block.height : null;
+  } catch {
+    return null;
   }
 }
 
