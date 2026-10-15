@@ -93,3 +93,10 @@ venv/
 *.swp
 deployments/local-*.json
 ai/
+
+# Operator wallet + deploy state (holds the wallet recovery phrase)
+.midnight-state.json
+.midnight-state.json.tmp-*
+.midnight-wallet-state/
+.operator/
+midnight-level-db/
