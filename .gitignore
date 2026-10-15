@@ -104,3 +104,7 @@ midnight-level-db/
 CLAUDE.md
 .claudeignore
 .ralph/
+
+# third-party reference captures (kept on disk for the design gate, never published)
+design/measure/ref-*/
+design/measure/*.png

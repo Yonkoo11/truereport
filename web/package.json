@@ -18,14 +18,16 @@
     "@midnight-ntwrk/midnight-js-protocol": "4.1.1",
     "@midnight-ntwrk/midnight-js-types": "4.1.1",
     "@midnight-ntwrk/midnight-js-utils": "4.1.1",
+    "@types/qrcode": "^1.5.5",
     "buffer": "^6.0.3",
     "fp-ts": "^2.16.11",
-    "truereport-contract": "*",
+    "pino": "^10.3.1",
+    "qrcode": "^1.5.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "rxjs": "^7.8.2",
     "semver": "^7.7.4",
-    "pino": "^10.3.1"
+    "truereport-contract": "*"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
