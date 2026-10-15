@@ -17,7 +17,9 @@ import { doctorIdOf, reportHashOf, bodyHashOf, newSalt, toHex, fromHex, encodeQr
 const VERIFY_BASE = process.env.TRUEREPORT_VERIFY_URL ?? 'https://truereport.vercel.app/verify';
 const { roleKey, doctorLeaf, reportCommitment } = TrueReport.pureCircuits;
 
-const [cmd, ...args] = process.argv.slice(2);
+// --network <id> may appear anywhere; resolveNetwork reads it, positional args skip it.
+const argv = process.argv.slice(2).filter((a, i, all) => a !== '--network' && all[i - 1] !== '--network' && !a.startsWith('--network='));
+const [cmd, ...args] = argv;
 const { network, config: networkConfig } = resolveNetwork();
 const deployment = getDeployment(network);
 if (!deployment) throw new Error(`No deployment recorded for ${network}. Run npm run deploy first.`);
@@ -92,5 +94,6 @@ async function main() {
 
 main().then(() => process.exit(0), (err) => {
   console.error(`\n  ❌ ${err?.message ?? err}`);
+  for (let c = err?.cause; c; c = c.cause) console.error(`     cause: ${c?.message ?? c}`);
   process.exit(1);
 });

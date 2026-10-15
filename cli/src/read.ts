@@ -15,7 +15,7 @@ if (!state) throw new Error(`Indexer has no state for ${address}`);
 const l = TrueReport.ledger(state.data);
 console.log(`network=${network} address=${address}`);
 console.log(`registrar=${toHex(l.registrar)} doctorCount=${l.doctorCount} issued=${l.issued.size()} revoked=${l.revoked.size()}`);
-const c = process.argv[2];
+const c = process.argv.slice(2).find((a) => /^[0-9a-f]{64}$/i.test(a)); // skip --network flags
 if (c) {
   const b = fromHex(c);
   console.log(`commitment ${c}: issued=${l.issued.member(b)} revoked=${l.revoked.member(b)}`);

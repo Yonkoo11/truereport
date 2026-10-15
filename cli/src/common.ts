@@ -65,7 +65,7 @@ export async function createProviders(walletCtx: WalletContext, networkConfig: N
   // The SDK requires the private-state password to be at least 16 characters.
   // The default below is a placeholder for local devnet only — set a strong
   // password via PRIVATE_STATE_PASSWORD when you move to a non-local target.
-  const privateStatePassword = process.env.PRIVATE_STATE_PASSWORD?.trim() || Buffer.from(loadOrCreateKey('state-password')).toString('hex');
+  const privateStatePassword = process.env.PRIVATE_STATE_PASSWORD?.trim() || `Tr!${Buffer.from(loadOrCreateKey('state-password')).toString('hex')}`; // SDK wants 3+ character classes; hex alone has 2
 
   const walletProvider = {
     // In Midnight.js 4.1.x the WalletProvider interface returns the key objects
