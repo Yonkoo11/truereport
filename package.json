@@ -5,13 +5,12 @@
   "type": "module",
   "workspaces": [
     "contract",
-    "api",
     "cli",
     "web"
   ],
   "scripts": {
     "compile": "cd contract && npm run compact",
-    "build": "cd contract && npm run build && cd ../api && npm run build"
+    "build": "cd contract && npm run build"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.1.4",
