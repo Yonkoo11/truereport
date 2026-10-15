@@ -1,0 +1,94 @@
+/**
+ * TrueReport: tamper-evident medical reports.
+ *
+ * A registrar (V1: the TrueReport operator, checking each doctor against the
+ * MDCN register) adds doctors. A doctor issues a report by proving, in zero
+ * knowledge, that they hold the secret key behind one registry leaf. The
+ * ledger stores only a salted commitment to the report, never its content,
+ * and never says which doctor issued it.
+ *
+ * Anyone holding the paper (with its QR) can recompute the commitment and
+ * check, by reading the public ledger, that it was issued and not revoked.
+ */
+
+pragma language_version 0.23;
+
+import CompactStandardLibrary;
+
+// Public ledger
+export ledger registrar: Bytes<32>;                    // hash of the registrar's secret key
+export ledger doctors: MerkleTree<10, Bytes<32>>;      // registry leaves: hash(doctor key, doctor id)
+export ledger doctorSlot: Map<Bytes<32>, Uint<64>>;    // leaf -> tree index, so a doctor can be removed
+export ledger doctorCount: Counter;                    // next free tree index
+export ledger issued: Map<Bytes<32>, Bytes<32>>;       // report commitment -> revoke tag
+export ledger revoked: Set<Bytes<32>>;                 // revoked report commitments
+
+// Private state, supplied by the caller's own device
+witness secretKey(): Bytes<32>;
+witness doctorPath(leaf: Bytes<32>): MerkleTreePath<10, Bytes<32>>;
+
+constructor() {
+  registrar = disclose(roleKey(secretKey()));
+}
+
+export pure circuit roleKey(sk: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<2, Bytes<32>>>([pad(32, "truereport:key:"), sk]);
+}
+
+export pure circuit doctorLeaf(pk: Bytes<32>, doctorId: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<3, Bytes<32>>>([pad(32, "truereport:doctor:"), pk, doctorId]);
+}
+
+export pure circuit reportCommitment(reportHash: Bytes<32>, doctorId: Bytes<32>, salt: Bytes<32>): Bytes<32> {
+  return persistentCommit<Vector<3, Bytes<32>>>([pad(32, "truereport:report:"), reportHash, doctorId], salt);
+}
+
+pure circuit revokeTag(sk: Bytes<32>, commitment: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<3, Bytes<32>>>([pad(32, "truereport:revoke:"), sk, commitment]);
+}
+
+circuit assertRegistrar(): [] {
+  assert(roleKey(secretKey()) == registrar, "only the registrar can do this");
+}
+
+export circuit addDoctor(leaf: Bytes<32>): [] {
+  assertRegistrar();
+  const l = disclose(leaf);
+  assert(!doctorSlot.member(l), "doctor already registered");
+  const slot = doctorCount.read() as Uint<64>;
+  doctors.insertIndex(l, slot);
+  doctorSlot.insert(l, slot);
+  doctorCount.increment(1);
+}
+
+export circuit removeDoctor(leaf: Bytes<32>): [] {
+  assertRegistrar();
+  const l = disclose(leaf);
+  assert(doctorSlot.member(l), "doctor not registered");
+  doctors.insertIndexDefault(doctorSlot.lookup(l));
+  doctorSlot.remove(l);
+}
+
+/**
+ * Issue a report. reportHash, doctorId and salt are private inputs: only
+ * the resulting commitment and an unlinkable revoke tag reach the ledger.
+ */
+export circuit issueReport(reportHash: Bytes<32>, doctorId: Bytes<32>, salt: Bytes<32>): [] {
+  const sk = secretKey();
+  const leaf = doctorLeaf(roleKey(sk), doctorId);
+  const path = doctorPath(leaf);
+  assert(path.leaf == leaf, "path is not for this doctor");
+  assert(doctors.checkRoot(disclose(merkleTreePathRoot<10, Bytes<32>>(path))), "not a registered doctor");
+  const c = disclose(reportCommitment(reportHash, doctorId, salt));
+  assert(!issued.member(c), "report already issued");
+  issued.insert(c, disclose(revokeTag(sk, c)));
+}
+
+/** Revoke a report. Only the key that issued it can. */
+export circuit revokeReport(commitment: Bytes<32>): [] {
+  const c = disclose(commitment);
+  assert(issued.member(c), "report not issued");
+  assert(issued.lookup(c) == revokeTag(secretKey(), c), "only the issuing doctor can revoke");
+  assert(!revoked.member(c), "report already revoked");
+  revoked.insert(c);
+}
