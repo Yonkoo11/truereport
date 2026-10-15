@@ -108,3 +108,15 @@ CLAUDE.md
 # third-party reference captures (kept on disk for the design gate, never published)
 design/measure/ref-*/
 design/measure/*.png
+
+# internal notes, kept on disk only
+ACCESS.md
+company/
+design/
+PROJECT_SPEC.md
+INVARIANTS.md
+SOCIAL_POSTS.md
+SUBMISSION.md
+VIDEO_SCRIPT.md
+cli/demo-links.txt
+cli/tx-log.txt
