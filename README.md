@@ -107,7 +107,7 @@ The verify page (`web/src/lib/verify.ts`) recomputes the commitment with the sam
 | **Contract: register, issue, revoke, refuse impostors** | Real. 21 simulator tests. The CI workflow in `.github/workflows/tests.yml` runs them on every push. |
 | **Full flow on a Midnight network** | Real on a local devnet (node 1.0.0, indexer 4.3.3, proof server 8.1.0): add a doctor, issue two reports, revoke one, an impostor key refused, a no-wallet read. |
 | **Verify page against that network** | Real on the local devnet: Genuine, Revoked and Altered examples land on the right verdict in a headless browser (the stills above). |
-| **Midnight Preview** | Not yet. The registry is not deployed on Preview while the test wallet awaits faucet funds; the live site says so instead of pretending. |
+| **Midnight Preview** | Real. Registry `bc6440d9…69182b4` on Preview: doctor registered (block 1320515), two reports issued, one revoked, impostor refused; the live site reads it (Genuine / Revoked / Not valid checked in headless Chrome, 0 console errors). |
 | Issuing and revoking from the web pages with the Lace wallet | Built, not yet tested on any network. The command line tool in `cli/` is the tested path. |
 | Diagnosis privacy | The ledger stores commitments only, and the QR carries no diagnosis text (tested). Whoever holds the paper can read it, as today. |
 | That the medical opinion is correct | Not claimed. A Genuine result proves origin, integrity and revocation status, nothing about the medicine. |
