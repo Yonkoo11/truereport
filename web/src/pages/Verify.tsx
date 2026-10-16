@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import type { QrPayload } from '../../../contract/src/report';
+import { decodeQr, encodeQr } from '../../../contract/src/report';
 import Fields from '../components/Fields';
 import Stamp from '../components/Stamp';
 import Steps from '../components/Steps';
-import { CONTRACT_ADDRESS, NETWORK } from '../lib/config';
+import { CONTRACT_ADDRESS, EXAMPLE_GENUINE, EXAMPLE_REVOKED, NETWORK } from '../lib/config';
 import { shortAddr } from '../lib/format';
 import { bodyMatches, check, SLOW_MS, type CheckResult, type Step } from '../lib/verify';
 
@@ -58,6 +59,7 @@ export default function Verify() {
       <main className="read">
         <h1 className="h1 h1--big">Scan the QR on the report</h1>
         <p className="lead">Point your phone camera at the square code on the paper. This page opens with the result.</p>
+        <Examples />
         <Privacy />
       </main>
     );
@@ -65,8 +67,30 @@ export default function Verify() {
   return <Checking fragment={fragment} />;
 }
 
-function Checking({ fragment }: { fragment: string }) {
-  const [state, setState] = useState<State>({ kind: 'loading', done: 0, slow: false });
+/** The genuine example with its conclusion changed, so the registry has no match. */
+const altered = (fragment: string): string => encodeQr({ ...decodeQr(fragment), conclusion: 'Unfit for work for 14 days' });
+
+function Examples() {
+  if (!CONTRACT_ADDRESS || !EXAMPLE_GENUINE || !EXAMPLE_REVOKED) return null;
+  const links: [string, string][] = [
+    ['Genuine', EXAMPLE_GENUINE],
+    ['Revoked', EXAMPLE_REVOKED],
+    ['Altered', altered(EXAMPLE_GENUINE)],
+  ];
+  return (
+    <p className="small examples">
+      No paper to hand? Try an example:{' '}
+      {links.map(([label, f], i) => (
+        <span key={label}>
+          {i > 0 && ' · '}
+          <a href={`/verify#${f}`}>{label}</a>
+        </span>
+      ))}
+    </p>
+  );
+}
+
+function Checking({ fragment }: { fragment: string }) {  const [state, setState] = useState<State>({ kind: 'loading', done: 0, slow: false });
   const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
