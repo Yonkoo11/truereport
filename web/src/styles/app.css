@@ -26,7 +26,14 @@ a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visib
   display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
 }
 .wordmark { font-size: var(--size-20); line-height: var(--lh-20); font-weight: var(--w-600); color: var(--ink-1); text-decoration: none; }
-.domain { font-size: var(--size-14); line-height: var(--lh-14); color: var(--ink-2); }
+.nav { display: flex; align-items: center; gap: var(--space-4); }
+.nav__link {
+  font-size: var(--size-16); line-height: var(--lh-16); color: var(--ink-2); text-decoration: none;
+  padding: var(--space-2) 0; border-bottom: 2px solid transparent; white-space: nowrap;
+}
+@media (hover: hover) { .nav__link:hover { color: var(--ink-1); } }
+.nav__link--here { color: var(--ink-1); font-weight: var(--w-600); border-bottom-color: var(--accent); }
+@media (max-width: 560px) { .nav { gap: var(--space-3); } .nav__link { font-size: var(--size-14); } }
 
 /* page frames */
 .page { max-width: var(--page-max); margin: 0 auto; padding: 0 var(--gutter); }
