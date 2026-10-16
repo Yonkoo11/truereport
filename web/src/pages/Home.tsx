@@ -5,6 +5,12 @@ import { CONTRACT_ADDRESS, EXAMPLE_GENUINE, EXAMPLE_REVOKED, NETWORK } from '../
 import { shortAddr } from '../lib/format';
 import { registryStats } from '../lib/verify';
 
+const VERDICTS = [
+  ['Genuine', 'ok', 'The printed lines came, unaltered, from a doctor key on the registry, and the report was not withdrawn.'],
+  ['Revoked', 'danger', 'The issuing doctor withdrew this report. Do not accept it.'],
+  ['Not on the registry', 'danger', 'No registered doctor issued a report matching this paper. It may have been altered.'],
+] as const;
+
 const STEPS = [
   ['A registered doctor issues it', "The doctor's key is on the registry for their name and MDCN folio. Issuing records a fingerprint of the printed lines on Midnight."],
   ['The paper carries the code', 'The QR holds the printed lines and a salt. The diagnosis text stays on the paper and in the clinic.'],
@@ -38,6 +44,14 @@ export default function Home() {
           <p className="small paper__foot">{PAPER_FOOTER}</p>
         </figure>
       </section>
+      <ol className="verdicts">
+        {VERDICTS.map(([word, tone, line]) => (
+          <li key={word}>
+            <Stamp word={word} tone={tone as 'ok' | 'danger'} size="sm" />
+            <p>{line}</p>
+          </li>
+        ))}
+      </ol>
       <ol className="how">
         {STEPS.map(([head, body], i) => (
           <li key={head}>
@@ -47,6 +61,17 @@ export default function Home() {
         ))}
       </ol>
       <p className="small live num"><LiveLine /></p>
+      <section className="proves limits">
+        <h2 className="h2">What this proves</h2>
+        <p>The printed lines above came, unaltered, from a doctor key on the registry for that name and folio, and the doctor has not withdrawn the report. It does not prove the medical opinion is correct.</p>
+      </section>
+      <section className="close">
+        <h2 className="h1">Check a Nigerian medical report in ten seconds.</h2>
+        <div className="btn-row">
+          <a className="btn btn--primary" href="/verify">Check a report</a>
+          <a className="btn btn--secondary" href="/doctor">I'm a doctor</a>
+        </div>
+      </section>
     </main>
   );
 }
