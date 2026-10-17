@@ -44,7 +44,14 @@ type State = { kind: 'loading'; done: number; slow: boolean } | { kind: 'error' 
 const Privacy = () => <p className="small foot">TrueReport never asks for your name, phone number or any ID.</p>;
 
 export default function Verify() {
-  const fragment = location.hash.slice(1);
+  // Same-page example clicks only change the hash, so listen for it:
+  // without this the example links on the empty page do nothing.
+  const [fragment, setFragment] = useState(() => location.hash.slice(1));
+  useEffect(() => {
+    const onHash = () => setFragment(location.hash.slice(1));
+    addEventListener('hashchange', onHash);
+    return () => removeEventListener('hashchange', onHash);
+  }, []);
   if (!CONTRACT_ADDRESS) {
     return (
       <main className="read">
