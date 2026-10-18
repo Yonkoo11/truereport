@@ -120,3 +120,11 @@ SUBMISSION.md
 VIDEO_SCRIPT.md
 cli/demo-links.txt
 cli/tx-log.txt
+
+# recorder scratch (browser profile, raw frames)
+video/engine/rec-*/
+video/engine/rec-*.concat
+video/engine/qa-*.json
+video/engine/qa-report.md
+video/engine/audit.json
+video/engine/mix-report.json
