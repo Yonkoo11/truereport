@@ -3,12 +3,14 @@
 # TrueReport
 
 [![tests](https://github.com/Yonkoo11/truereport/actions/workflows/tests.yml/badge.svg)](https://github.com/Yonkoo11/truereport/actions/workflows/tests.yml)
+[![live](https://img.shields.io/badge/live-truereport.vercel.app-3fb950)](https://truereport.vercel.app)
+![contract tests](https://img.shields.io/badge/contract%20tests-21%2F21-3fb950)
 
 ### A paper medical report anyone can check, without anyone seeing the diagnosis.
 
 **A registered Nigerian doctor prints a QR code on a sick note or medical report. Anyone who scans it, with no wallet and no sign-up, sees whether the printed lines are unaltered, came from a doctor key on the registry for that name and folio, and are still valid. The Midnight ledger holds only salted commitments, so the diagnosis never leaves the paper.**
 
-**[ Live ↗ ](https://truereport.vercel.app)** · **[ Verify it yourself ↗ ](#verify-it-yourself-in-60-seconds)** · **[ What's real ↗ ](#whats-real-and-what-we-deliberately-did-not-claim)**
+**[ Live ↗ ](https://truereport.vercel.app)** · **[ Watch the demo ↗ ](https://youtu.be/9nnZ7klLVs4)** · **[ Verify it yourself ↗ ](#verify-it-yourself-in-60-seconds)** · **[ What's real ↗ ](#whats-real-and-what-we-deliberately-did-not-claim)**
 
 Built for the Midnight Buildathon, Wave 2 (AKINDO WaveHack).
 
@@ -18,7 +20,9 @@ Built for the Midnight Buildathon, Wave 2 (AKINDO WaveHack).
 
 ---
 
-## ▶ What a scan shows
+## ▶ Demo
+
+**[Watch the demo ↗](https://youtu.be/9nnZ7klLVs4)** · also live: open the site and click one of the three example links on the Check a report page.
 
 *Captured from the real site running against a local Midnight devnet, using reports issued by the command line tool in `cli/`.*
 
@@ -148,6 +152,7 @@ web/src/
 scripts/
   readme-images.mjs    # builds the README pictures from captures of the running site
 proof-server/          # Dockerfile for the proof server
+deck/                  # the Wave 2 slides (HTML source and PDF)
 ```
 
 ## License
